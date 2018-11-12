@@ -3,20 +3,25 @@ const router = express.Router();
 
 router.get('/', (req, res, next) => {
     res.status(200).json({
-        message: 'orders were fetched'
+        message: 'orders were fetched',
+        order: order
     });
 });
 
 router.post('/', (req, res, next) => {
+    const order = {
+        productID: req.body.productID,
+        quantity: req.body.quantity
+    }
     res.status(200).json({
-        message: 'orders were created'
+        message: 'orders were created',
+        orderID: order
     });
 });
 
 router.get('/:orderID', (req, res, next) => {
     res.status(200).json({
-        message: 'Order detail',
-        orderID: req.params.orderID
+        message: 'Order detail'
     });
 });
 
