@@ -32,7 +32,7 @@ app.use('/products', productRoutes);
 app.use('/orders', ordersRoutes);
 
 app.use((req, res, next) => {
-    const error = new Error('Not found');
+    const error = new Error('Error');
     error.status = 404;
     next(error);
 });
