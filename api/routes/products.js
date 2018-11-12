@@ -6,8 +6,13 @@ const Product = require('../models/product');
 
 // Handle get request
 router.get('/', (req, res, next) => {
-    res.status(200).json({
-        message: 'Handling get request to /products'
+    Product.find().exec().then(docs => {
+        console.log(docs);
+        res.status(200).json(docs);
+    })
+    .catch (err => {
+        console.log(err);
+        res.status(500).json(err);
     })
 });
 
@@ -27,6 +32,12 @@ router.post('/', (req, res, next) => {
         message: 'Handling post request to /products',
         createdProduct: product
     })
+    .catch(err => {
+        console.log(err);
+        res.status(500).json({
+            error: err
+        });
+    });
 });
 
 // Handle get request with ID
@@ -35,9 +46,11 @@ router.get('/:productID', (req, res, next) => {
     const productID = req.params.productID;
     Product.findById(productID).exec().then(doc => {
         console.log(doc);
-        res.status(200).json({
-            doc: doc
-        });
+        if (doc){
+            res.status(200).json(doc);
+        } else {
+            res.status(404).json({message: "No valid id found"});
+        }
     })
     .catch(err => {
         console.log(err);
@@ -55,8 +68,17 @@ router.patch('/:productID', (req, res, next) => {
 });
 
 router.delete('/:productID', (req, res, next) => {
-    res.status(200).json({
-        message: 'Delete product'
+    // params is in the url
+    // body is in the HTTP body
+    const productID = req.params.productID;
+    console.log("Product ID is " + productID);
+    Product.remove({_id: productID}).exec().then(result => {
+        res.status(200).json(result);
+    }).catch(err => {
+        res.status(500).json({
+            message: "Operation unsuccessful",
+            error: err
+        });
     });
 });
 
