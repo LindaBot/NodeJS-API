@@ -6,8 +6,22 @@ const Product = require('../models/product');
 
 // Handle get request
 router.get('/', (req, res, next) => {
-    Product.find().exec().then(docs => {
-        res.status(200).json(docs);
+    Product.find().select('name price _id').exec().then(docs => {
+        const response = {
+            count: docs.length,
+            products: docs.map(doc => {
+                return{
+                    name: doc.name,
+                    price: doc.price,
+                    _id: doc._id,
+                    request: {
+                        type: 'GET',
+                        url: 'http://localhost:3000/products/' + doc._id
+                    }
+                }
+            })
+        };
+        res.status(200).json(response);
     })
     .catch (err => {
         console.log(err);
@@ -26,7 +40,7 @@ router.post('/', (req, res, next) => {
 
     product.save().then(result => {
         res.status(201).json({
-            message: 'Handling post request to /products',
+            message: 'Added the following product',
             createdProduct: product
         })
     })
