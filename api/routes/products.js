@@ -6,17 +6,17 @@ const Product = require('../models/product');
 
 // Handle get request
 router.get('/', (req, res, next) => {
-    Product.find().select('name price _id').exec().then(docs => {
+    Product.find().select('name price _id').exec().then(results => {
         const response = {
-            count: docs.length,
-            products: docs.map(doc => {
+            count: results.length,
+            products: results.map(item => {
                 return{
-                    name: doc.name,
-                    price: doc.price,
-                    _id: doc._id,
+                    name: item.name,
+                    price: item.price,
+                    _id: item._id,
                     request: {
                         type: 'GET',
-                        url: 'http://localhost:3000/products/' + doc._id
+                        url: 'http://localhost:3000/products/' + item._id
                     }
                 }
             })
@@ -41,7 +41,12 @@ router.post('/', (req, res, next) => {
     product.save().then(result => {
         res.status(201).json({
             message: 'Added the following product',
-            createdProduct: product
+            createdProduct: {
+                name: result.name,
+                price: result.price,
+                _id: result._id,
+                url: 'http://localhost:3000/products/' + result.id
+            }
         })
     })
     .catch(err => {
