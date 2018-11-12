@@ -55,12 +55,22 @@ router.get('/:productID', (req, res, next) => {
         console.log(err);
         res.status(500).json({
             error: err,
-            message: "Could not find"
+            message: "Internal server error"
         })
     });
 });
 
 router.patch('/:productID', (req, res, next) => {
+    /*
+    Usage:
+    HTTP request body:
+    [
+    {
+        "propName": "name",
+        "value": "harry potter"
+    }
+    ]
+    */
     const productID = req.params.productID;
     const updateOps = {};
     for (const ops of req.body) {
