@@ -7,7 +7,6 @@ const Product = require('../models/product');
 // Handle get request
 router.get('/', (req, res, next) => {
     Product.find().exec().then(docs => {
-        console.log(docs);
         res.status(200).json(docs);
     })
     .catch (err => {
@@ -62,9 +61,19 @@ router.get('/:productID', (req, res, next) => {
 });
 
 router.patch('/:productID', (req, res, next) => {
-    res.status(200).json({
-        message: 'Updated product'
-    });
+    const productID = req.params.productID;
+    const updateOps = {};
+    for (const ops of req.body) {
+        updateOps[ops.propName] = ops.value;
+    }
+    console.log(updateOps);
+    Product.update({_id: productID}, {$set: updateOps}).exec()
+        .then(result => {
+            res.status(200).json(result);
+        }) 
+        .catch (err => {
+            res.status(500).json(err);
+        });
 });
 
 router.delete('/:productID', (req, res, next) => {
