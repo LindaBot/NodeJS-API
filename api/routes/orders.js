@@ -5,7 +5,7 @@ const Order = require('../models/orders');
 const Product = require('../models/product');
 
 router.get('/', (req, res, next) => {
-    Order.find().exec()
+    Order.find().populate('product', 'name price').exec()
     .then(docs => {
         res.status(200).json({
             count: docs.length,
