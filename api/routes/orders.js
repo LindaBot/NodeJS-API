@@ -31,13 +31,14 @@ router.post('/', (req, res, next) => {
     // Check if the productID exists
     Product.findById(req.body.productID)
     .then(docs => {
-        if (docs === null){
-            res.status(404).json({Error: "Product not found"});
+        if (!docs){
+            return(res.status(404).json({Error: "Product not found"}));
         }
     })
     .catch(err => {
-        res.status(500).json(err);
+       return res.status(500).json({Error: "Internal server error"});
     });
+    
     const order = new Order({
         _id: mongoose.Types.ObjectId(),
         quantity: req.body.quantity,
@@ -58,14 +59,30 @@ router.post('/', (req, res, next) => {
         });
     })
     .catch(err => {
-        res.status(500).json(err);
+        res.status(500).json({Error: "Internal server error"});
     });
 });
 
 router.get('/:orderID', (req, res, next) => {
-    res.status(200).json({
-        message: 'Order detail'
-    });
+    orderID = req.params.orderID;
+    Order.findById(orderID).exec()
+    .then(docs => {
+        if (!docs){
+            return res.status(404).json({
+                message: 'Order not found'
+            })
+        }
+        res.status(200).json({
+            order: docs,
+            request: {
+                type: 'GET',
+                url: "http://localhost:3000/orders"
+            }
+        });
+    })
+    .catch(err => {
+        res.status(500).json(err);
+    })
 });
 
 router.post('/:orderID', (req, res, next) => {
@@ -76,10 +93,20 @@ router.post('/:orderID', (req, res, next) => {
 });
 
 router.delete('/:orderID', (req, res, next) => {
-    const orderID = res.params.orderID;
+    const orderID = req.params.orderID;
     Order.remove({_id: orderID}).exec()
     .then(docs => {
-        res.status(201).json(docs);
+        res.status(200).json({
+            message: "Order Deleted",
+            request: {
+                types: "POST",
+                url: "http://localhost:3000/orders",
+                body: {
+                    productID: "ID",
+                    quantity: "Number"
+                }
+            }
+        });
     })
     .catch(err => {
         res.status(500).json(err);
